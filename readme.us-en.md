@@ -1,16 +1,14 @@
-## Vulmap - Vulnerability scanning and verification tools
-Vulmap是一款漏洞扫描工具, 可对Web容器、Web服务器、Web中间件以及CMS等Web程序进行漏洞扫描, 并且具备漏洞利用功能。
-相关测试人员可以使用vulmap检测目标是否存在特定漏洞, 并且可以使用漏洞利用功能验证漏洞是否真实存在。
+## Vulmap - Web vulnerability scanning and verification tools
+Vulmap is a vulnerability scanning tool that can scan for vulnerabilities in Web containers, Web servers, Web middleware, and CMS and other Web programs, and has vulnerability exploitation functions.
+Relevant testers can use vulmap to detect whether the target has a specific vulnerability, and can use the vulnerability exploitation function to verify whether the vulnerability actually exists.
 
-Vulmap目前有漏洞扫描(poc)和漏洞利用(exp)模式, 使用"-m"选现指定使用哪个模式, 缺省则默认poc模式, 在poc模式中还支持"-f"批量目标扫描、"-o"文件输出结果等主要功能, 更多功能参见[Options](https://github.com/zhzyker/vulmap/#options)或者python3 vulmap.py -h, 漏洞利用exp模式中将不再提供poc功能, 而是直接进行漏洞利用, 并反馈回利用结果, 用于进一步验证漏洞是否存在, 是否可被利用。
+Vulmap currently has vulnerability scanning (poc) and exploiting (exp) modes. Use "-m" to select which mode to use, and the default poc mode is the default. In poc mode, it also supports "-f" batch target scanning, "-o" File output results and other main functions, Other functions [Options](https://github.com/zhzyker/vulmap/#options) Or python3 vulmap.py -h, the Poc function will no longer be provided in the exploit exploit mode, but the exploit will be carried out directly, and the exploit result will be fed back to further verify whether the vulnerability exists and whether it can be exploited.  
 
-程序完全使用python3编写, 只要确保操作系统中有python3环境, 在Linux、MacOS、Windows中都可运行, 推荐使用python3.7或者更高的版本, vulmap目前只有CLI(命令行)界面, 所以需要在命令行中运行, 详细使用说明请参[Options](https://github.com/zhzyker/vulmap/#options)
-
-**应尽量使用 "-a" 制定目标类型以减少误报，例如 "-a solr"**  
+**Try to use "-a" to establish target types to reduce false positives, such as "-a solr"**  
 
 ## Installation
-操作系统中必须有python3, 推荐python3.7或者更高版本
-* 安装所需的依赖环境
+The operating system must have python3, python3.7 or higher is recommended
+* Installation dependency
 ```
 pip3 install -r requirements.txt
 ```
@@ -21,61 +19,63 @@ python3 vulmap.py -u http://example.com
 
 ## Options
 ``` 
-可选参数:
-  -h, --help            显示此帮助消息并退出
-  -u URL, --url URL     目标 URL (示例: -u "http://example.com")
-  -f FILE, --file FILE  选择一个目标列表文件,每个 url 必须用行来区分 (示例: -f "/home/user/list.txt")
-  -m MODE, --mode MODE  模式支持 "poc" 和 "exp",可以省略此选项,默认进入 "poc" 模式
-  -a APP, --app APP     指定 Web 容器、Web 服务器、Web 中间件或 CMD（例如: "weblogic"）不指定则默认扫描全部
-  -c CMD, --cmd CMD     自定义远程命令执行执行的命令,如果不是 "netstat -an" 和 "id" 可能影响程序判断,默认是 "netstat -an"
-  -v VULN, --vuln VULN  利用漏洞,需要指定漏洞编号 (示例: -v "CVE-2020-2729")
-  --list                显示支持的漏洞列表
-  --debug               Debug 模式,将显示 request 和 responses
-  --delay DELAY         延时时间,每隔多久发送一次,默认0s
-  --timeout TIMEOUT     超时时间,默认10s
-  --output FILE         文本模式输出结果 (示例: -o "result.txt")
+optional arguments:
+  -h, --help            show this help message and exit
+  -u URL, --url URL     Target URL (e.g. -u "http://example.com")
+  -f FILE, --file FILE  Select a target list file, and the url must be distinguished by lines (e.g. -f "/home/user/list.txt")
+  -m MODE, --mode MODE  The mode supports "poc" and "exp", you can omit this option, and enter poc mode by default
+  -a APP, --app APP     Specify a web app or cms (e.g. -a "weblogic"). default scan all
+  -c CMD, --cmd CMD     Custom RCE vuln command, Other than "netstat -an" and "id" can affect program judgment. defautl is "netstat -an"
+  -v VULN, --vuln VULN  Exploit, Specify the vuln number (e.g. -v "CVE-2020-2729")
+  --list                Displays a list of vulnerabilities that support scanning
+  --debug               Debug mode echo request and responses
+  --delay DELAY         Delay check time, default 0s
+  --timeout TIMEOUT     Scan timeout time, default 10s
+  --output FILE         Text mode export (e.g. -o "result.txt")
 ```
+
 ## Examples
-测试所有漏洞 poc
+Test all vulnerabilities poc mode
 ```
 python3 vulmap.py -u http://example.com
 ```
-针对 RCE 漏洞,使用 id 命令检测是否存在漏洞,因为个别 linux 系统中没有 "netstat -an" 命令
+For RCE vuln, use the "id" command to test the vuln, because some linux does not have the "netstat -an" command
 ```
 python3 vulmap.py -u http://example.com -c "id"
 ```
 
-检查 http://example.com 是否存在 struts2 漏洞
+Check http://example.com for struts2 vuln
 ```
 python3 vulmap.py -u http://example.com -a struts2
 ```
 ```
 python3 vulmap.py -u http://example.com -m poc -a struts2
 ```
-对 http://example.com:7001 进行 WebLogic 的 CVE-2019-2729 漏洞利用
+Exploit the CVE-2019-2729 vuln of WebLogic on http://example.com:7001
 ```
 python3 vulmap.py -u http://example.com:7001 -v CVE-2019-2729
 ```
 ```
 python3 vulmap.py -u http://example.com:7001 -m exp -v CVE-2019-2729
 ```
-批量扫描 list.txt 中的 url
+Batch scan URLs in list.txt
 ```
 python3 vulmap.py -f list.txt
 ```
-扫描结果导出到 result.txt
+Export scan results to result.txt
 ```
 python3 vulmap.py -u http://example.com:7001 -o result.txt
 ```
 
 ## Vulnerabilitys List
-vulmap支持的漏洞如下
+Vulmap supported vulnerabilities are as follows
 ```
  +-------------------+------------------+-----+-----+-------------------------------------------------------------+
  | Target type       | Vuln Name        | Poc | Exp | Impact Version && Vulnerability description                 |
  +-------------------+------------------+-----+-----+-------------------------------------------------------------+
+ | Apache Shiro      | CVE-2016-4437    |  Y  |  Y  | <= 1.2.4, shiro-550, rememberme deserialization rce         |
  | Apache Solr       | CVE-2017-12629   |  Y  |  Y  | < 7.1.0, runexecutablelistener rce & xxe, only rce is here  |
- | Apache Solr       | CVE-2019-0193    |  Y  |  Y  | < 8.2.0, dataimporthandler module remote code execution     |
+ | Apache Solr       | CVE-2019-0193    |  Y  |  N  | < 8.2.0, dataimporthandler module remote code execution     |
  | Apache Solr       | CVE-2019-17558   |  Y  |  Y  | 5.0.0 - 8.3.1, velocity response writer rce                 |
  | Apache Struts2    | S2-005           |  Y  |  Y  | 2.0.0 - 2.1.8.1, cve-2010-1870 parameters interceptor rce   |
  | Apache Struts2    | S2-008           |  Y  |  Y  | 2.0.0 - 2.3.17, debugging interceptor rce                   |
@@ -97,10 +97,11 @@ vulmap支持的漏洞如下
  | Apache Tomcat     | CVE-2020-1938    |  Y  |  Y  | 6, 7 < 7.0.100, 8 < 8.5.51, 9 < 9.0.31 arbitrary file read  |
  | Drupal            | CVE-2018-7600    |  Y  |  Y  | 6.x, 7.x, 8.x, drupalgeddon2 remote code execution          |
  | Drupal            | CVE-2018-7602    |  Y  |  Y  | < 7.59, < 8.5.3 (except 8.4.8) drupalgeddon2 rce            |
+ | Drupal            | CVE-2019-6340    |  Y  |  Y  | < 8.6.10, drupal core restful remote code execution         |
  | Jenkins           | CVE-2017-1000353 |  Y  |  N  | <= 2.56, LTS <= 2.46.1, jenkins-ci remote code execution    |
  | Jenkins           | CVE-2018-1000861 |  Y  |  Y  | <= 2.153, LTS <= 2.138.3, remote code execution             |
  | Nexus OSS/Pro     | CVE-2019-7238    |  Y  |  Y  | 3.6.2 - 3.14.0, remote code execution vulnerability         |
- | Nexus OSS/Pro     | CVE-2020-10199   |  N  |  Y  | 3.x  <= 3.21.1, remote code execution vulnerability         |
+ | Nexus OSS/Pro     | CVE-2020-10199   |  Y  |  Y  | 3.x  <= 3.21.1, remote code execution vulnerability         |
  | Oracle Weblogic   | CVE-2014-4210    |  Y  |  N  | 10.0.2 - 10.3.6, weblogic ssrf vulnerability                |
  | Oracle Weblogic   | CVE-2017-3506    |  Y  |  Y  | 10.3.6.0, 12.1.3.0, 12.2.1.0-2, weblogic wls-wsat rce       |
  | Oracle Weblogic   | CVE-2017-10271   |  Y  |  Y  | 10.3.6.0, 12.1.3.0, 12.2.1.1-2, weblogic wls-wsat rce       |
@@ -108,8 +109,20 @@ vulmap支持的漏洞如下
  | Oracle Weblogic   | CVE-2019-2725    |  Y  |  Y  | 10.3.6.0, 12.1.3.0, weblogic wls9-async deserialization rce |
  | Oracle Weblogic   | CVE-2019-2729    |  Y  |  Y  | 10.3.6.0, 12.1.3.0, 12.2.1.3 wls9-async deserialization rce |
  | Oracle Weblogic   | CVE-2020-2551    |  Y  |  N  | 10.3.6.0, 12.1.3.0, 12.2.1.3-4, wlscore deserialization rce |
+ | Oracle Weblogic   | CVE-2020-2555    |  Y  |  Y  | 3.7.1.17, 12.1.3.0.0, 12.2.1.3-4.0, t3 deserialization rce  |
+ | Oracle Weblogic   | CVE-2020-2883    |  Y  |  Y  | 10.3.6.0, 12.1.3.0, 12.2.1.3-4, iiop t3 deserialization rce |
+ | Oracle Weblogic   | CVE-2020-14882   |  Y  |  Y  | 10.3.6.0, 12.1.3.0, 12.2.1.3-4, 14.1.1.0.0, console rce     |
  | RedHat JBoss      | CVE-2010-0738    |  Y  |  Y  | 4.2.0 - 4.3.0, jmx-console deserialization any files upload |
  | RedHat JBoss      | CVE-2010-1428    |  Y  |  Y  | 4.2.0 - 4.3.0, web-console deserialization any files upload |
  | RedHat JBoss      | CVE-2015-7501    |  Y  |  Y  | 5.x, 6.x, jmxinvokerservlet deserialization any file upload |
+ | ThinkPHP          | CVE-2019-9082    |  Y  |  Y  | < 3.2.4, thinkphp rememberme deserialization rce            |
+ | ThinkPHP          | CVE-2018-20062   |  Y  |  Y  | <= 5.0.23, 5.1.31, thinkphp rememberme deserialization rce  |
  +-------------------+------------------+-----+-----+-------------------------------------------------------------+
+```
+
+## Docker
+
+```shell
+docker build -t vulmap/vulmap .
+docker run --rm -ti vulmap/vulmap  python vulmap.py -u https://www.example.com
 ```
